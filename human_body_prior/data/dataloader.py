@@ -41,7 +41,7 @@ class VPoserDS(Dataset):
             self.ds[k] = torch.load(data_fname)
 
     def __len__(self):
-       return len(self.ds['trans'])
+       return len(self.ds['pose'])
 
     def __getitem__(self, idx):
         return self.fetch_data(idx)
@@ -49,9 +49,9 @@ class VPoserDS(Dataset):
     def fetch_data(self, idx):
         data = {k: self.ds[k][idx] for k in self.ds.keys()}
         pose = data.pop('pose')
-        data['pose_aa'] = pose.view(1,52,3)[:,1:22]
+        data['pose_aa'] = pose.view(1,24,3)[:,1:22]
         if 'pose_matrot' not in data.keys():
             data['pose_matrot'] = VPoser.aa2matrot(data['pose_aa'][np.newaxis]).view(1,-1,9)
         else:
-            data['pose_matrot'] = data['pose_matrot'].view(1,52,9)[:,1:22]
+            data['pose_matrot'] = data['pose_matrot'].view(1,24,9)[:,1:22]
         return data

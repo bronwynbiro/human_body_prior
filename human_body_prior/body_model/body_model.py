@@ -62,6 +62,14 @@ class BodyModel(nn.Module):
         # -- Load SMPL params --
         if '.npz' in bm_path:
             smpl_dict = np.load(bm_path, encoding='latin1')
+        elif '.pkl' in bm_path:
+          import pickle
+          import gzip
+          with open(bm_path, 'rb') as f:
+              u = pickle._Unpickler(f)
+              u.encoding = 'latin1'
+              smpl_dict = u.load()
+              #smpl_dict = np.load(bm_path, allow_pickle = True)
         else:
             raise ValueError('bm_path should be either a .pkl nor .npz file')
 
@@ -119,7 +127,11 @@ class BodyModel(nn.Module):
             self.register_buffer('dmpldirs', torch.tensor(dmpldirs, dtype=dtype))
 
         # Regressor for joint locations given shape - 6890 x 24
-        self.register_buffer('J_regressor', torch.tensor(smpl_dict['J_regressor'], dtype=dtype))
+        elif '.pkl' in bm_path:
+            self.register_buffer('J_regressor', torch.tensor(smpl_dict['J_regressor'].todense(), dtype=dtype))
+        else:
+            self.register_buffer('J_regressor', torch.tensor(smpl_dict['J_regressor'], dtype=dtype))
+
 
         # Pose blend shape basis: 6890 x 3 x 207, reshaped to 6890*30 x 207
         if use_posedirs:
@@ -194,7 +206,6 @@ class BodyModel(nn.Module):
     def forward(self, root_orient=None, pose_body=None, pose_hand=None, pose_jaw=None, pose_eye=None, betas=None,
                 trans=None, dmpls=None, expression=None, return_dict=False, v_template =None, **kwargs):
         '''
-
         :param root_orient: Nx3
         :param pose_body:
         :param pose_hand:
@@ -282,5 +293,4 @@ class BodyModel(nn.Module):
             res = res_class
 
         return res
-
 

@@ -351,7 +351,7 @@ class VPoserTrainer:
         self.logger(
             'Started Training at %s for %d epochs' % (datetime.strftime(starttime, '%Y-%m-%d_%H:%M:%S'), num_epochs))
 
-        vis_bm =  BodyModel(self.ps.bm_path, 'smpl', num_betas=10).to(self.comp_device)
+        vis_bm =  BodyModel(self.ps.bm_path,num_betas=10).to(self.comp_device)
         prev_lr = np.inf
         scheduler = torch.optim.lr_scheduler.StepLR(self.optimizer, step_size=int(num_epochs // 3), gamma=0.5)
         for epoch_num in range(1, num_epochs + 1):

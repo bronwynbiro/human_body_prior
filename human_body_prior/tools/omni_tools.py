@@ -79,9 +79,10 @@ def makepath(desired_path, isfile = False):
     '''
     import os
     if isfile:
-        if not os.path.exists(os.path.dirname(desired_path)):os.makedirs(os.path.dirname(desired_path))
+        os.makedirs(desired_path)
     else:
-        if not os.path.exists(desired_path): os.makedirs(desired_path)
+        if not os.path.exists(desired_path): 
+          os.makedirs(desired_path)
     return desired_path
 
 def matrot2axisangle(matrots):

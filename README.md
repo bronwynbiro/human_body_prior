@@ -1,96 +1,42 @@
-# VPoser: Variational Human Pose Prior
-![alt text](github_data/vposer_samples.png "Novel Human Poses Sampled From the VPoser.")
-## Description
-The articulated 3D pose of the human body is high-dimensional and complex. 
-Many applications make use of a prior distribution over valid human poses, but modeling this distribution is difficult.
-Here we provide a learned distribution trained from a large dataset of human poses represented as SMPL bodies.
 
-Here we present a method that is used in [SMPLify-X](https://smpl-x.is.tue.mpg.de/). 
-Our variational human pose prior, named VPoser, has the following features: 
- - defines a prior of SMPL pose parameters
- - is end-to-end differentiable
- - provides a way to penalize impossible poses while admitting valid ones
- - effectively models correlations among the joints of the body
- - introduces an efficient, low-dimensional, representation for human pose
- - can be used to generate valid 3D human poses for data-dependent tasks
+# Pose Forecasting in the SFU-Store-Nav 3D Virtual Human Platform
 
-## Table of Contents
-  * [Description](#description)
-  * [Installation](#installation)
-  * [Loading trained models](#loading-trained-models) 
-  * [Train VPoser](#train-vposer)
-  * [Tutorials](#tutorials)
-  * [Citation](#citation)
-  * [License](#license)
-  * [Acknowledgments](#acknowledgments)
-  * [Contact](#contact)
-  * [FAQ](https://github.com/nghorbani/human_body_prior/wiki/FAQ)
+This repo contains code to create 3D simulations for the SFU-Store-Nav dataset. The retail scene was re-created in Blender, and the 3D body shape and pose estimations were combined with motion capture data to have virtual humans interact with the scene as in the original experiment.  We also propose an LSTM Variational Autoencoder that learns a latent representation of human pose and regularizes the distribution of the latent code to be a normal distribution. We can then predict future poses given an input sequence. 
 
-## Installation
-**Requirements**
-- Python 3.7
-- [Configer](https://github.com/nghorbani/configer)
-- [PyTorch 1.1.0](https://pytorch.org/get-started/previous-versions/)
-- [Torchgeometry 0.1.2](https://pypi.org/project/torchgeometry/0.1.2/)
-- [Pyrender](https://pyrender.readthedocs.io/en/latest/install/index.html#osmesa) for visualizations
+This code is built upon [VPoser](https://github.com/nghorbani/human_body_prior), and we use their methods to visualize the SMPL body. 
 
-Install from this repository for the latest developments:
-```bash
-pip install git+https://github.com/nghorbani/configer
-pip install git+https://github.com/nghorbani/human_body_prior
-```
+If you only want to run the pose forecasting, you can skip to that section. Otherwise, the first few steps explain how to gather the data and visualize it in Blender. 
 
-**Optional dependencies:**
+## Gathering the data
+Get the original SFU-Store-Nav dataset from [here](https://www.rosielab.ca/datasets/sfu-store-nav). 
 
-If you want to use the feature to [Disentangle Self-Intersecting Poses](https://github.com/nghorbani/human_body_prior/tree/master/human_body_prior/body_model#disentangling-self-intersecting-novel-poses)
-please install the optional package [mesh_intersection](https://github.com/vchoutas/torch-mesh-isect).
+## Get SMPL meshes
+We use [VIBE](https://github.com/mkocabas/VIBE) to get the SMPL body parameters and meshes. You will need to download the SMPL body from [here](https://smpl.is.tue.mpg.de/). You can use the Colab demo [here](https://colab.research.google.com/drive/1dFfwxZ52MN86FA6uFNypMEdFShd2euQA), but modify it to add the `--save_obj` flag: 
 
-## Loading Trained Models
+     !python demo.py --vid_file VID_NAME.avi --output_folder OUTPUT_NAME --save_obj
 
-To download the trained *VPoser*  models go to the [SMPL-X project website](https://smpl-x.is.tue.mpg.de/) and register to get access to the downloads section. Afterwards, you can follow the [model loading tutorial](notebooks/vposer_poZ.ipynb) to load and use your trained VPoser models.
+After running, save the corresponding .obj files and the .pkl file.
 
-## Train VPoser
-We train VPoser, using a [variational autoencoder](https://arxiv.org/abs/1312.6114)
-that learns a latent representation of human pose and regularizes the distribution of the latent code to be a normal distribution.
-We train our prior on data from the [AMASS](https://amass.is.tue.mpg.de/) dataset; 
-specifically, the SMPL pose parameters of various publicly available human motion capture datasets. 
-You can follow the [data preparation tutorial](human_body_prior/data/README.md) to learn how to download and prepare AMASS for VPoser.
-Afterwards, you can [train VPoser from scratch](human_body_prior/train/README.md). 
+## Run Blender script
+### Importing body meshes to Blender
+We use the [Stop Motion Obj](https://github.com/neverhood311/Stop-motion-OBJ) plugin in Blender to import the body meshes. Follow the instructions, then in Blender:
+1.  Click File > Import > Mesh Sequence
+2.  Navigate to the folder where your mesh sequence is stored
+3.  In the File Name box, provide 0
+4.  Leave the Cache Mode set to Cached
+5.  Click Select Folder and wait while your sequence is loaded
+6.  Click the sequence in "Scene Collection"  
+7.  Click Context > Object
+8.  Click Mesh Sequence > Advanced > Bake sequence
 
-## Tutorials
-![alt text](github_data/latent_interpolation_1.gif "Interpolation of novel poses on the smoother VPoser latent space.")
-![alt text](github_data/latent_interpolation_2.gif "Interpolation of novel poses on the smoother VPoser latent space.")
+If there were multiple body IDs returned, you will need to repeat for each different ID folder. 
 
-* [VPoser PoZ Space for Body Models](notebooks/vposer_poZ.ipynb)
-* [Sampling Novel Body Poses from VPoser](notebooks/vposer_sampling.ipynb)
-* [Preparing VPoser Training Dataset](human_body_prior/data/README.md)
-* [Train VPoser from Scratch](human_body_prior/train/README.md)
+### Set the positions
 
-## Citation
-Please cite the following paper if you use this code directly or indirectly in your research/projects:
-```
-@inproceedings{SMPL-X:2019,
-  title = {Expressive Body Capture: 3D Hands, Face, and Body from a Single Image},
-  author = {Pavlakos, Georgios and Choutas, Vasileios and Ghorbani, Nima and Bolkart, Timo and Osman, Ahmed A. A. and Tzionas, Dimitrios and Black, Michael J.},
-  booktitle = {Proceedings IEEE Conf. on Computer Vision and Pattern Recognition (CVPR)},
-  year = {2019}
-}
-```
-Also note that if you consider training your own VPoser for your research using the AMASS dataset, 
-then please follow its respective citation guideline.
+You will need to put the corresponding .csv files into a folder of the form `YOUR ROOT DIR/csvs/VIDEO_NAME`. Then, set the `root_path` and `video_name`  variables in `set_scene.py` and run it. 
+
+## Pose forecasting
+
+You will need to download the SMPL body from [here](https://smpl.is.tue.mpg.de/) and save it under `human_body_prior/smpl/models/neutral.pkl`.  You will also need to download a trained VPoser from the [SMPL-X project website](https://smpl-x.is.tue.mpg.de/). Then, you can run the [pose forecasting notebook](https://github.com/bronwynbiro/human_body_prior/blob/master/Pose_forecasting.ipynb). It is also compatible with Colab, but the visualizations require GPU. 
+
  
-## License
-
-Software Copyright License for **non-commercial scientific research purposes**.
-Please read carefully the [terms and conditions](./LICENSE) and any accompanying documentation before you download and/or use the SMPL-X/SMPLify-X model, data and software, (the "Model & Software"), including 3D meshes, blend weights, blend shapes, textures, software, scripts, and animations. By downloading and/or using the Model & Software (including downloading, cloning, installing, and any other use of this github repository), you acknowledge that you have read these terms and conditions, understand them, and agree to be bound by them. If you do not agree with these terms and conditions, you must not download and/or use the Model & Software. Any infringement of the terms of this agreement will automatically terminate your rights under this [License](./LICENSE).
-
-## Contact
-The code in this repository is developed by [Nima Ghorbani](https://nghorbani.github.io/).
-
-If you have any questions you can contact us at [smplx@tuebingen.mpg.de](mailto:smplx@tuebingen.mpg.de).
-
-For commercial licensing, contact [ps-licensing@tue.mpg.de](mailto:ps-licensing@tue.mpg.de)
-
-## Acknowledgments
-We thank the authors of [AMASS](https://amass.is.tue.mpg.de/) for their early release of their dataset for this project.
-We thank [Partha Ghosh](https://ps.is.tuebingen.mpg.de/person/pghosh) for disscussions and insights that helped with this project.

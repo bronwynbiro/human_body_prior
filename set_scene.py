@@ -44,7 +44,7 @@ def get_position(people, times):
                             
                         location = (-x, -y, 0)
                             
-                        rotation_euler =  Euler((1.75814, 0, yaw), 'XYZ')
+                        rotation_euler =  Euler((0, 0, yaw), 'XYZ')
                         frame_to_data[frame] = [location, rotation_euler]
                         
                         

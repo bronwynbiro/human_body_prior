@@ -37,6 +37,13 @@ You will need to put the corresponding .csv files into a folder of the form `YOU
 
 ## Pose forecasting
 
-You will need to download the SMPL body from [here](https://smpl.is.tue.mpg.de/) and save it under `human_body_prior/smpl/models/neutral.pkl`.  You will also need to download a trained VPoser from the [SMPL-X project website](https://smpl-x.is.tue.mpg.de/). Then, you can run the [pose forecasting notebook](https://github.com/bronwynbiro/human_body_prior/blob/master/Pose_forecasting.ipynb). It is also compatible with Colab, but the visualizations require GPU. 
-
- 
+1. Download the SMPL body from [here](https://smpl.is.tue.mpg.de/) and save it under `human_body_prior/smpl/models/neutral.pkl`.  
+2. Follow the instructions [here](https://github.com/vchoutas/smplx/blob/f4206853a4746139f61bdcf58571f2cea0cbebad/tools/README.md) to make the pkl file compatible with Python 3. 
+3. Download a trained VPoser from the [SMPL-X project website](https://smpl-x.is.tue.mpg.de/). 
+4. Change the `torchgometry/core/conversions.py: L302:304` to:
+```
+mask_c1 = mask_d2 * ~mask_d0_d1
+mask_c2 = ~mask_d2 * mask_d0_nd1
+mask_c3 = ~mask_d2) * ~mask_d0_nd1
+```
+5. Run the [pose forecasting notebook](https://github.com/bronwynbiro/human_body_prior/blob/master/Pose_forecasting.ipynb). It is compatible with Colab, but the visualizations require GPU.

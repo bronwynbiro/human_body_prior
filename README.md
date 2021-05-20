@@ -44,6 +44,6 @@ You will need to put the corresponding .csv files into a folder of the form `YOU
 ```
 mask_c1 = mask_d2 * ~mask_d0_d1
 mask_c2 = ~mask_d2 * mask_d0_nd1
-mask_c3 = ~mask_d2) * ~mask_d0_nd1
+mask_c3 = ~mask_d2 * ~mask_d0_nd1
 ```
 5. Run the [pose forecasting notebook](https://github.com/bronwynbiro/human_body_prior/blob/master/Pose_forecasting.ipynb). It is compatible with Colab, but the visualizations require GPU.

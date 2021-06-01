@@ -1,5 +1,6 @@
 
 # Pose Forecasting in the SFU-Store-Nav 3D Virtual Human Platform
+Code for the paper ["The SFU-Store-Nav 3D Virtual Human Platform for Human-Aware Robotics"](https://motionpredictionicra2021.github.io/papers/LHMP_2021_paper_biro.pdf), presented at the ICRA 2021 workshop on Long-term Human Motion Prediction.
 
 This repo contains code to create 3D simulations for the SFU-Store-Nav dataset. The retail scene was re-created in Blender, and the 3D body shape and pose estimations were combined with motion capture data to have virtual humans interact with the scene as in the original experiment.  We also propose an LSTM Variational Autoencoder that learns a latent representation of human pose and regularizes the distribution of the latent code to be a normal distribution. We can then predict future poses given an input sequence. 
 
